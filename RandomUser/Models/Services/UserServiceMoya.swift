@@ -70,7 +70,7 @@ private extension String {
 
 class UserServiceMoya: RandomUserServiceProtocol {
     
-    func getUsers(page: Int, results: Int, seed: String, completion: @escaping ([User]?, String?) -> ()) {
+    func getUsers(page: Int, results: Int, seed: String, completion: @escaping (Result<[User], ErrorTypes>) -> ()) {
         // If you want to debug, use this:
         // let provider = MoyaProvider<MoyaEnums>(plugins: [NetworkLoggerPlugin()])
         let provider = MoyaProvider<MoyaEnums>()
@@ -79,12 +79,12 @@ class UserServiceMoya: RandomUserServiceProtocol {
                 switch result {
                 case let .success(moyaResponse):
                     let userResult = try JSONDecoder().decode(UserResult.self, from: moyaResponse.data)
-                    completion(userResult.results, nil)
-                case let .failure(error):
-                    completion(nil, error.localizedDescription)
+                    completion(.success(userResult.results))
+                case .failure(_):
+                    completion(.failure(.unexpectedError))
                 }
-            } catch let error {
-                completion(nil, error.localizedDescription)
+            } catch {
+                completion(.failure(.unexpectedError))
             }
         }
     }

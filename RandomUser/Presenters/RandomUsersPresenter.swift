@@ -75,12 +75,13 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        baseUserService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { incomingUsers, error in
-            if let incomingUsers = incomingUsers {
-                self.users = incomingUsers
+        baseUserService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
+            switch result {
+            case .success(let users):
+                self.users = users
                 self.randomUserProtocol?.didRandomUsersAvailable()
-            } else {
-                self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: error ?? errorTypes.unexpectedError.rawValue)
+            case .failure(let errorType):
+                self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: errorType.rawValue)
             }
         }
     }
@@ -107,12 +108,13 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        baseUserService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { (incomingUsers, error) in
-            if let incomingUsers = incomingUsers {
-                self.users.append(contentsOf: incomingUsers)
+        baseUserService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
+            switch result {
+            case .success(let users):
+                self.users.append(contentsOf: users)
                 self.randomUserProtocol?.didEndRandomUsersPaging()
-            } else {
-                self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: error ?? errorTypes.unexpectedError.rawValue)
+            case .failure(let errorType):
+                self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: errorType.rawValue)
             }
             self.isFetchInProgress = false
         }
