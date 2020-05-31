@@ -38,7 +38,7 @@ extension RandomUserTableViewCell {
     /// Shows the data of the user.
     func configureData(withUser user: User) {
         userName?.text = user.fullName
-        ImageProvider().load(url: user.picture.medium, into: userImage, type: .sdwebimage, isLoadingPresenting: true)
+        ImageService().load(url: user.picture.medium, into: userImage, type: .sdwebimage, isLoadingPresenting: true)
     }
     
     /// Shows the data that the user wants to see.

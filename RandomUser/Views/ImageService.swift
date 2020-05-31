@@ -12,7 +12,7 @@ import Kingfisher
 import SDWebImage
 
 // MARK: - A class that loads images into `UIImageView`s.
-class ImageProvider {
+class ImageService {
     
     /// This class currently supports the 3 major imageloader external libraries.
     enum ProviderType {

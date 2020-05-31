@@ -49,7 +49,7 @@ extension UserDetailsViewController {
         let gradient = SkeletonGradient(baseColor: .darkGray)
         userImageView.showAnimatedGradientSkeleton(usingGradient: gradient, transition: .crossDissolve(1))
         
-        ImageProvider().load(url: user.picture.large, into: userImageView, completionHandler: {
+        ImageService().load(url: user.picture.large, into: userImageView, completionHandler: {
             self.userImageView.hideSkeleton()
         }, type: .nuke, withDelay: 2.0)
     }
