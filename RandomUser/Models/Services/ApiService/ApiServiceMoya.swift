@@ -6,9 +6,10 @@
 //  Copyright © 2020. Kálai Kristóf. All rights reserved.
 //
 
-import Foundation
 import Moya
+import Foundation
 
+/// Moya endpoints' definition.
 enum MoyaEnums {
     case randomUsers(page: Int, results: Int, seed: String)
 }
@@ -54,22 +55,20 @@ extension MoyaEnums: TargetType {
         nil
     }
     
-    var baseURL: URL { return URL(string: "https://randomuser.me/api/1.3")! }
-}
-
-// MARK: - Helpers.
-private extension String {
-    var urlEscaped: String {
-        return addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-    }
-    
-    var utf8Encoded: Data {
-        return data(using: .utf8)!
+    var baseURL: URL {
+        return URL(string: ApiServiceContainer.getBaseApiUrl())!
     }
 }
 
+/// The `ApiServiceProtocol` implemented by Moya.
 class ApiServiceMoya: ApiServiceProtocol {
     
+    /// Download random users with the given parameters.
+    /// - Parameters:
+    ///   - page: the page that wanted to be downloaded.
+    ///   - results: the number of results in a page.
+    ///   - seed: the API use this to give back some data. For the same seed it gives back the same results.
+    ///   - completion: will be called after the data is ready in an array, or an error occured. Both parameters in the same time couldn't be `nil`.
     func getUsers(page: Int, results: Int, seed: String, completion: @escaping (Result<[User], ErrorTypes>) -> ()) {
         // If you want to debug, use this:
         // let provider = MoyaProvider<MoyaEnums>(plugins: [NetworkLoggerPlugin()])

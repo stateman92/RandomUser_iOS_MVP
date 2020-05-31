@@ -13,16 +13,17 @@ import Lottie
 class RandomUsersViewController: UIViewController {
     
     /// MVP architecture element.
-    var randomUsersPresenter: RandomUserPresenterProtocol = RandomUsersPresenter(.moya)
+    var randomUsersPresenter: RandomUserPresenterProtocol = RandomUsersPresenter()
     
     @IBOutlet weak var tableView: UITableView!
     
     private let refreshControl = UIRefreshControl()
     
-    /// Shows weather the initial users' data downloaded.
+    /// Shows weather the initial users' data downloaded (or retrieved from cache).
     private var animationView = AnimationView(name: "loading")
     
-    /// After the user claim that wants to refresh, the cells dissolves with this delay. After that the Presenter can start the refresh.
+    /// After the user claims that wants to refresh, the cells dissolves with this delay.
+    /// After that the Presenter can start the refresh.
     private let refreshDelay = 0.33
     private var selectedRow: Int? = nil
     private let detailsSegue = "showDetailsSegue"
@@ -42,7 +43,7 @@ extension RandomUsersViewController {
         animationView.configure(on: view)
         setupTableViewAndRefreshing()
         
-        randomUsersPresenter.getRandomUsers()
+        randomUsersPresenter.getCachedUsers()
         
         navigationController?.hero.isEnabled = true
     }

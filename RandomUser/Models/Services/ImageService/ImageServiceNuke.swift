@@ -9,10 +9,15 @@
 import UIKit
 import Nuke
 
+/// The `ImageServiceProtocol` implemented by Nuke.
 class ImageServiceNuke: ImageServiceProtocol {
     
+    /// Load an url into the image.
+    /// - Parameters:
+    ///   - url: the url in `URL` format of the image.
+    ///   - into: the `UIImageView` that will hold the image.
+    ///   - completionHandler: will be called after the image loaded.
     func load(url: URL, into imageView: UIImageView, completionHandler: @escaping () -> ()) {
-        
         let options = ImageLoadingOptions(
             transition: .fadeIn(duration: 0.33)
         )

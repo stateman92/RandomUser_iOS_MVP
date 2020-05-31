@@ -6,12 +6,18 @@
 //  Copyright © 2020. Kálai Kristóf. All rights reserved.
 //
 
-import Foundation
 import Alamofire
+import Foundation
 
-/// The service, which used to download user-related data.
+/// The `ApiServiceProtocol` implemented by Alamofire.
 class ApiServiceAlamofire: ApiServiceProtocol {
     
+    /// Download random users with the given parameters.
+    /// - Parameters:
+    ///   - page: the page that wanted to be downloaded.
+    ///   - results: the number of results in a page.
+    ///   - seed: the API use this to give back some data. For the same seed it gives back the same results.
+    ///   - completion: will be called after the data is ready in an array, or an error occured. Both parameters in the same time couldn't be `nil`.
     func getUsers(page: Int, results: Int, seed: String, completion: @escaping (Result<[User], ErrorTypes>) -> ()) {
         guard let url = createUrl(page, results, seed) else {
             completion(.failure(.cannotBeReached))
@@ -42,7 +48,7 @@ class ApiServiceAlamofire: ApiServiceProtocol {
                           URLQueryItem(name: "page", value: String(page)),
                           URLQueryItem(name: "results", value: String(results)),
                           URLQueryItem(name: "seed", value: String(seed))]
-        guard var urlComps = URLComponents(string: "https://randomuser.me/api/1.3/") else { return nil }
+        guard var urlComps = URLComponents(string: ApiServiceContainer.getBaseApiUrl()) else { return nil }
         urlComps.queryItems = queryItems
         guard let url = urlComps.url else { return nil }
         return url

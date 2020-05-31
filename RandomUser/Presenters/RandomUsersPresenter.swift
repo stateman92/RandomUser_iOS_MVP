@@ -14,23 +14,24 @@ class RandomUsersPresenter {
     /// MVP architecture elements.
     private var randomUserProtocol: RandomUserViewProtocol?
     private var apiServiceContainer: ApiServiceContainerProtocol
+    private var persistenceServiceContainer: PersistenceServiceContainerProtocol
     
     /// Dependency Injection via Constructor Injection.
-    init(_ userServiceType: ApiServiceBase.USType) {
-        self.apiServiceContainer = ApiServiceBase.init(userServiceType)
+    init(_ apiServiceType: ApiServiceContainer.USType = .alamofire, _ persistenceServiceType: PersistenceServiceContainer.PSType = .realm) {
+        self.apiServiceContainer = ApiServiceContainer.init(apiServiceType)
+        self.persistenceServiceContainer = PersistenceServiceContainer.init(persistenceServiceType)
     }
     
     /// Number of users that will be downloaded at the same time.
     private let numberOfUsersPerPage = 10
     /// The initial seed value. Changed after all refresh / restart.
     private var seed = String.getRandomString()
-    
     /// Returns the number of the next page.
     private var nextPage: Int {
         return users.count / numberOfUsersPerPage + 1
     }
     
-    /// RandomUserPresenterProtocol variables part.
+    /// `RandomUserPresenterProtocol` variables part.
     
     /// The so far fetched user data.
     var users = [User]()
@@ -43,6 +44,7 @@ class RandomUsersPresenter {
 extension RandomUsersPresenter: RandomUserPresenterProtocol {
     
     /// Returns the so far fetched data + number of users in a page.
+    /// - Note:
     /// If the number of the displayed user is greater or equal with the `users.count` but less than the `currentMaxUsers`,
     ///     the View can display a loading icon.
     var currentMaxUsers: Int {
@@ -50,6 +52,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     }
     
     /// Self-check, that actually distinct users are fetched.
+    /// - Note:
     /// Can be used to display somewhere.
     var numberOfDistinctNamedPeople: Int {
         Set(users.map { user -> String in
@@ -63,13 +66,18 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     }
     
     /// Dependency Injection via Setter Injection.
-    func inject(_ baseUserService: ApiServiceContainerProtocol) {
-        self.apiServiceContainer = baseUserService
+    func inject(_ apiServiceContainer: ApiServiceContainerProtocol) {
+        self.apiServiceContainer = apiServiceContainer
+    }
+    
+    /// Dependency Injection via Setter Injection.
+    func inject(_ persistenceServiceContainer: PersistenceServiceContainerProtocol) {
+        self.persistenceServiceContainer = persistenceServiceContainer
     }
     
     /// Fetch some random users.
-    /// It calls either `randomUsersAvailable()` or `errorWhileDownload()` method of the `delegate`.
     /// - Note:
+    /// It calls either `randomUsersAvailable()` or `errorWhileDownload()` method of the `delegate`.
     /// The `isFetchInProgress` variable should be set to false by the View after all the data displayed corretly!
     func getRandomUsers() {
         guard !isFetchInProgress else { return }
@@ -86,20 +94,6 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         }
     }
     
-    /// Fetch some new random users.
-    /// Remove all so far downloaded data, recreate the seed value.
-    /// Immediately calls the `randomUsersRefreshStarted()` method of the `delegate`.
-    /// - Parameters:
-    ///   - withDelay: the duration after the fetch starts.
-    func refresh(withDelay delay: Double = 0) {
-        users.removeAll()
-        seed = String.getRandomString()
-        randomUserProtocol?.willRandomUsersRefresh()
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.getRandomUsers()
-        }
-    }
-    
     /// Fetch some more random users.
     /// - Note:
     /// If a fetch is in progress, does nothing.
@@ -112,11 +106,44 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
             switch result {
             case .success(let users):
                 self.users.append(contentsOf: users)
+                
+                self.persistenceServiceContainer.delete(self.persistenceServiceContainer.objects(UserObject.self))
+                self.persistenceServiceContainer.add(self.users)
+                
                 self.randomUserProtocol?.didEndRandomUsersPaging()
             case .failure(let errorType):
                 self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: errorType.rawValue)
             }
             self.isFetchInProgress = false
+        }
+    }
+    
+    /// Fetch some new random users.
+    /// - Note:
+    /// Remove all so far downloaded data, recreate the seed value.
+    /// Immediately calls the `randomUsersRefreshStarted()` method of the `delegate`.
+    /// - Parameters:
+    ///   - withDelay: the duration after the fetch starts.
+    func refresh(withDelay delay: Double = 0) {
+        users.removeAll()
+        seed = String.getRandomString()
+        randomUserProtocol?.willRandomUsersRefresh()
+        run(delay) {
+            self.getRandomUsers()
+        }
+    }
+    
+    /// Retrieve the previously cached users.
+    func getCachedUsers() {
+        run(1.0) {
+            defer {
+                self.randomUserProtocol?.didRandomUsersAvailable()
+            }
+            
+            let users = self.persistenceServiceContainer.objects(UserObject.self)
+            for user in users {
+                self.users.append(User(managedObject: user))
+            }
         }
     }
 }

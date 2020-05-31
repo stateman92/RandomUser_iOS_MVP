@@ -42,9 +42,14 @@ protocol RandomUserPresenterProtocol {
     var currentMaxUsers: Int { get }
     
     /// Self-check, that actually distinct users are fetched.
+    /// - Note:
+    /// Can be used to display somewhere. 
     var numberOfDistinctNamedPeople: Int { get }
     
+    /// Dependency Injection via Setter Injection.
     func inject(_ delegate: RandomUserViewProtocol)
+    func inject(_ apiServiceContainer: ApiServiceContainerProtocol)
+    func inject(_ persistenceServiceContainer: PersistenceServiceContainerProtocol) 
     
     /// Fetch some random users.
     func getRandomUsers()
@@ -54,6 +59,9 @@ protocol RandomUserPresenterProtocol {
     
     /// Fetch some new random users.
     func refresh(withDelay: Double)
+    
+    /// Retrieve the previously cached users.
+    func getCachedUsers()
 }
 
 // MARK: - Service parts.
@@ -69,17 +77,14 @@ protocol ApiServiceContainerProtocol {
     
     /// Download random users with the given parameters.
     /// - Parameters:
-    ///   - page: the page that you want to download.
+    ///   - page: the page that wanted to be downloaded.
     ///   - results: the number of results in a page.
-    ///   - seed: the API use this to give some data. For the same seed, it gives back the same results.
-    ///   - completion: will be called after the data is ready in an array, or some error occured. Both parameters in the same time couldn't be `nil`.
+    ///   - seed: the API use this to give back some data. For the same seed it gives back the same results.
+    ///   - completion: will be called after the data is ready in an array, or an error occured. Both parameters in the same time couldn't be `nil`.
     func getUsers(page: Int, results: Int, seed: String, completion: @escaping (Result<[User], ErrorTypes>) -> ())
     
-    /// The API URL (in `String`).
-    /// - Note:
-    /// The number in the `String` indicate the used version of the API.
-    /// With `1.3` it works fine, but maybe a newer version would break the implementation.
-    func getBaseApiUrl() -> String
+    /// The API URL (in `String` format).
+    static func getBaseApiUrl() -> String
 }
 
 // MARK: - ApiService part.
@@ -87,10 +92,10 @@ protocol ApiServiceProtocol {
     
     /// Download random users with the given parameters.
     /// - Parameters:
-    ///   - page: the page that you want to download.
+    ///   - page: the page that wanted to be downloaded.
     ///   - results: the number of results in a page.
-    ///   - seed: the API use this to give some data. For the same seed, it gives back the same results.
-    ///   - completion: will be called after the data is ready in an array, or some error occured. Both parameters in the same time couldn't be `nil`.
+    ///   - seed: the API use this to give back some data. For the same seed it gives back the same results.
+    ///   - completion: will be called after the data is ready in an array, or an error occured. Both parameters in the same time couldn't be `nil`.
     func getUsers(page: Int, results: Int, seed: String, completion: @escaping (Result<[User], ErrorTypes>) -> ())
 }
 
@@ -103,8 +108,8 @@ protocol ImageServiceContainerProtocol {
     
     /// Load an url into the image.
     /// - Parameters:
-    ///   - urlString: the url in string format of the image.
-    ///   - imageView: the `UIImageView` that will hold the image.
+    ///   - url: the url in `String` format of the image.
+    ///   - into: the `UIImageView` that will hold the image.
     ///   - withDelay: seconds, after the image loading will start.
     ///   - isLoadingPresenting: whether it shows a loading animation before it loaded.
     ///   - completionHandler: will be called after the image loaded.
@@ -112,6 +117,11 @@ protocol ImageServiceContainerProtocol {
 }
 extension ImageServiceContainerProtocol {
     
+    /// Load an url into the image. It's the customization of the `ImageServiceContainerProtocol`'s `load(url:into:withdelay:isloadingPresenting:completionHandler:)` method.
+    /// - Parameters:
+    ///   - withDelay: optional argument, by default it is 0.0.
+    ///   - isLoadingPresenting: optional argument, by default it is false.
+    ///   - completionHandler: optional argument, by default it does nothing.
     func load(url urlString: String, into imageView: UIImageView, withDelay delay: Double = 0.0, isLoadingPresenting loading: Bool = false, completionHandler: @escaping () -> Void = { }) {
         load(url: urlString, into: imageView, withDelay: delay, isLoadingPresenting: loading, completionHandler: completionHandler)
     }
@@ -122,8 +132,8 @@ protocol ImageServiceProtocol {
     
     /// Load an url into the image.
     /// - Parameters:
-    ///   - urlString: the url in string format of the image.
-    ///   - imageView: the `UIImageView` that will hold the image.
+    ///   - url: the url in `URL` format of the image.
+    ///   - into: the `UIImageView` that will hold the image.
     ///   - completionHandler: will be called after the image loaded.
     func load(url: URL, into imageView: UIImageView, completionHandler: @escaping () -> ())
 }
@@ -134,25 +144,43 @@ protocol ImageServiceProtocol {
 // MARK: - PersistenceService Container part.
 protocol PersistenceServiceContainerProtocol {
     
+    /// Store a `Persistable` struct into a database.
     func add<T: Persistable>(_ value: T)
     
-    func add<T : Sequence>(_ sequence: T) where T.Element: Persistable
+    /// Store some `Persistable` structs into a database.
+    func add<T: Sequence>(_ sequence: T) where T.Element: Persistable
     
+    /// Delete the `Object` Element from the database.
     func delete<Element: Object>(_ objects: Results<Element>)
+    
+    /// Retrieve the `Object` Element from the database.
+    func objects<Element: Object>(_ type: Element.Type) -> Results<Element>
 }
 
 // MARK: - PersistenceService part.
 protocol PersistenceServiceProtocol {
     
+    /// Store a `Persistable` struct into a database.
+    func add<T: Persistable>(_ value: T) throws
+    
+    /// Store some `Persistable` structs into a database.
+    func add<T: Sequence>(_ sequence: T) throws where T.Element: Persistable
+    
+    /// Delete the `Object` Element from the database.
+    func delete<Element: Object>(_ objects: Results<Element>) throws
+    
+    /// Retrieve the `Object` Element from the database.
+    func objects<Element: Object>(_ type: Element.Type) throws -> Results<Element>
 }
 
-// MARK: - Pardonable structs conform.
-public protocol Persistable {
+// MARK: - Persistable part.
+protocol Persistable {
     associatedtype ManagedObject: Object
     
     /// Create the `struct` based on the `Object` from the database.
-    init(managedObject: ManagedObject)
+    /// If the`Object` is `nil`, it should initialize the struct appropriately.
+    init(managedObject: ManagedObject?)
     
-    /// Create the `Object` that will be stored in the database based on the `stuct`.
+    /// Create the `Object` that will be stored in the database based on the `struct`.
     func managedObject() -> ManagedObject
 }
