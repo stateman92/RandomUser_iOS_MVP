@@ -35,6 +35,7 @@
 		7C3E9B052483BC230061A945 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 7C3E9B042483BC230061A945 /* Lottie */; };
 		7C3E9B072483BC2C0061A945 /* loading.json in Resources */ = {isa = PBXBuildFile; fileRef = 7C3E9B062483BC2C0061A945 /* loading.json */; };
 		7C3E9B092483BF900061A945 /* AnimationView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3E9B082483BF900061A945 /* AnimationView+Extensions.swift */; };
+		7C3E9B0C2484029A0061A945 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7C3E9B0B2484029A0061A945 /* RealmSwift */; };
 		7C5CB4B5246B522E00E2B95E /* UIActivityIndicatorView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5CB4B4246B522E00E2B95E /* UIActivityIndicatorView+Extensions.swift */; };
 		7C5CB4B7246B531E00E2B95E /* UIBarButtonItem+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5CB4B6246B531E00E2B95E /* UIBarButtonItem+Extension.swift */; };
 		7CC4AFD2246F1D5500E83734 /* Hero in Frameworks */ = {isa = PBXBuildFile; productRef = 7CC4AFD1246F1D5500E83734 /* Hero */; };
@@ -92,6 +93,7 @@
 				7C2952A5246AD6B100E4B64B /* Kingfisher in Frameworks */,
 				7CC4AFD2246F1D5500E83734 /* Hero in Frameworks */,
 				7CC4AFD5246F20D600E83734 /* Moya in Frameworks */,
+				7C3E9B0C2484029A0061A945 /* RealmSwift in Frameworks */,
 				7C3E9B002483B4B90061A945 /* SDWebImage in Frameworks */,
 				7C29529D246AD41000E4B64B /* Alamofire in Frameworks */,
 				7C3E9AFB2483AA5E0061A945 /* SkeletonView in Frameworks */,
@@ -239,6 +241,7 @@
 				7C3E9AFA2483AA5E0061A945 /* SkeletonView */,
 				7C3E9AFF2483B4B90061A945 /* SDWebImage */,
 				7C3E9B042483BC230061A945 /* Lottie */,
+				7C3E9B0B2484029A0061A945 /* RealmSwift */,
 			);
 			productName = RandomUser;
 			productReference = 7C295281246AD09300E4B64B /* RandomUser.app */;
@@ -278,6 +281,7 @@
 				7C3E9AF92483AA5E0061A945 /* XCRemoteSwiftPackageReference "SkeletonView" */,
 				7C3E9AFE2483B4B90061A945 /* XCRemoteSwiftPackageReference "SDWebImage" */,
 				7C3E9B032483BC230061A945 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				7C3E9B0A2484029A0061A945 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
 			);
 			productRefGroup = 7C295282246AD09300E4B64B /* Products */;
 			projectDirPath = "";
@@ -586,6 +590,14 @@
 				minimumVersion = 3.1.8;
 			};
 		};
+		7C3E9B0A2484029A0061A945 /* XCRemoteSwiftPackageReference "realm-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
 		7CC4AFD0246F1D5500E83734 /* XCRemoteSwiftPackageReference "Hero" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/HeroTransitions/Hero";
@@ -634,6 +646,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7C3E9B032483BC230061A945 /* XCRemoteSwiftPackageReference "lottie-ios" */;
 			productName = Lottie;
+		};
+		7C3E9B0B2484029A0061A945 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C3E9B0A2484029A0061A945 /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			productName = RealmSwift;
 		};
 		7CC4AFD1246F1D5500E83734 /* Hero */ = {
 			isa = XCSwiftPackageProductDependency;
