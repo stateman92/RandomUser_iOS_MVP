@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Lottie
 
 // MARK: - The main View base part.
 class RandomUsersViewController: UIViewController {
@@ -19,7 +20,7 @@ class RandomUsersViewController: UIViewController {
     private let refreshControl = UIRefreshControl()
     
     /// Shows weather the initial users' data downloaded.
-    private var activityIndicatorView = UIActivityIndicatorView()
+    private var animationView = AnimationView(name: "loading")
     
     /// After the user claim that wants to refresh, the cells dissolves with this delay. After that the Presenter can start the refresh.
     private let refreshDelay = 0.33
@@ -38,10 +39,9 @@ extension RandomUsersViewController {
         setupBackButtonOnNextVC()
         setupLeftBarButton()
         
-        activityIndicatorView.configure()
+        animationView.configure(on: view)
         setupTableViewAndRefreshing()
         
-        activityIndicatorView.startAnimating()
         randomUsersPresenter.getRandomUsers()
         
         navigationController?.hero.isEnabled = true
@@ -74,7 +74,7 @@ extension RandomUsersViewController: UITableViewDelegate, UITableViewDataSource 
     /// If currently refreshing or downloads the initial users, show `0` cells. Otherwise show the `currentMaxUsers`.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         refreshUserCounter()
-        if activityIndicatorView.isAnimating || refreshControl.isRefreshing {
+        if animationView.isAnimationPlaying || refreshControl.isRefreshing {
             return 0
         } else {
             return randomUsersPresenter.currentMaxUsers
@@ -99,7 +99,7 @@ extension RandomUsersViewController: UITableViewDelegate, UITableViewDataSource 
     
     /// After the initial download (while the `activityIndicatorView` is animating), refresh the data.
     @objc func tableViewPullToRefresh() {
-        if !activityIndicatorView.isAnimating {
+        if !animationView.isAnimationPlaying {
             randomUsersPresenter.refresh(withDelay: refreshDelay)
         } else {
             refreshControl.endRefreshing()
@@ -152,12 +152,14 @@ extension RandomUsersViewController {
         refreshControl.tintColor = .white
         refreshControl.addTarget(self, action: #selector(tableViewPullToRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
-        tableView.backgroundView = activityIndicatorView
     }
     
-    private func stopAnimating() {
+    private func stopAnimating(completion: @escaping () -> () = { }) {
         refreshControl.endRefreshing()
-        activityIndicatorView.stopAnimating()
+        animationView.hide(1.0) { _ in
+            self.animationView.stop()
+            completion()
+        }
     }
 }
 
@@ -166,9 +168,10 @@ extension RandomUsersViewController: RandomUserViewProtocol {
     
     /// After successfully filled the array of the data, stop the animation and animate the `UITableView`.
     func didRandomUsersAvailable() {
-        stopAnimating()
-        tableView.animateUITableView {
-            self.randomUsersPresenter.isFetchInProgress = false
+        stopAnimating {
+            self.tableView.animateUITableView {
+                self.randomUsersPresenter.isFetchInProgress = false
+            }
         }
     }
     
