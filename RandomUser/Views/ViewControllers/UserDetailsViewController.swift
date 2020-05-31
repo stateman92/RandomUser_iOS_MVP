@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SkeletonView
 import Hero
 
 // MARK: - The main ViewController base part.
@@ -26,6 +26,9 @@ extension UserDetailsViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.isSkeletonable = true
+        userImageView.isSkeletonable = true
+        
         navigationItem.title = "\(user.fullName) (\(user.gender))"
         fillLayoutWithData()
         
@@ -38,9 +41,16 @@ extension UserDetailsViewController {
 extension UserDetailsViewController {
     
     private func fillLayoutWithData() {
-        userImageView.kf.indicatorType = .activity
-        userImageView.kf.setImage(with: URL(string: user.picture.large))
         userAccessibilitiesLabel.text = user.accessibilities
         userLocationLabel.text = user.expandedLocation
+        userImageView.backgroundColor = .darkGray
+        
+        // The placeholder will be a SkeletonView, something like Facebook.
+        let gradient = SkeletonGradient(baseColor: .darkGray)
+        userImageView.showAnimatedGradientSkeleton(usingGradient: gradient, transition: .crossDissolve(1))
+        
+        ImageProvider().load(url: user.picture.large, into: userImageView, completionHandler: {
+            self.userImageView.hideSkeleton()
+        }, type: .nuke, withDelay: 2.0)
     }
 }

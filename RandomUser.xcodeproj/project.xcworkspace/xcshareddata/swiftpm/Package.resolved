@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "Nuke",
+        "repositoryURL": "https://github.com/kean/Nuke",
+        "state": {
+          "branch": null,
+          "revision": "e901272a7cc5a28734d4f196d543edcf7efd8f4c",
+          "version": "9.0.0"
+        }
+      },
+      {
         "package": "ReactiveSwift",
         "repositoryURL": "https://github.com/Moya/ReactiveSwift.git",
         "state": {
@@ -53,6 +62,24 @@
           "branch": null,
           "revision": "002d325b0bdee94e7882e1114af5ff4fe1e96afa",
           "version": "5.1.1"
+        }
+      },
+      {
+        "package": "SDWebImage",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImage",
+        "state": {
+          "branch": null,
+          "revision": "5818cf70fde7e9e07e24196d0d54350bc8526f26",
+          "version": "5.8.0"
+        }
+      },
+      {
+        "package": "SkeletonView",
+        "repositoryURL": "https://github.com/Juanpe/SkeletonView",
+        "state": {
+          "branch": null,
+          "revision": "d09a5d75ee09a89db2555a83ab2d61d04c93419b",
+          "version": "1.8.7"
         }
       }
     ]

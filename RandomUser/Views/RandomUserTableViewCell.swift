@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Kingfisher
 
 // MARK: - The UITableViewCell base part.
 class RandomUserTableViewCell: UITableViewCell {
@@ -39,8 +38,7 @@ extension RandomUserTableViewCell {
     /// Shows the data of the user.
     func configureData(withUser user: User) {
         userName?.text = user.fullName
-        userImage.kf.indicatorType = .activity
-        userImage.kf.setImage(with: URL(string: user.picture.large))
+        ImageProvider().load(url: user.picture.medium, into: userImage, type: .sdwebimage, isLoadingPresenting: true)
     }
     
     /// Shows the data that the user wants to see.
