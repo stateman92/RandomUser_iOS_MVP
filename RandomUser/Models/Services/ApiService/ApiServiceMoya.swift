@@ -68,7 +68,7 @@ private extension String {
     }
 }
 
-class UserServiceMoya: RandomUserServiceProtocol {
+class ApiServiceMoya: ApiServiceProtocol {
     
     func getUsers(page: Int, results: Int, seed: String, completion: @escaping (Result<[User], ErrorTypes>) -> ()) {
         // If you want to debug, use this:

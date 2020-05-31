@@ -13,7 +13,7 @@ import Lottie
 class RandomUsersViewController: UIViewController {
     
     /// MVP architecture element.
-    var randomUsersPresenter: RandomUserPresenterProtocol = RandomUsersPresenter(UserServiceMoya())
+    var randomUsersPresenter: RandomUserPresenterProtocol = RandomUsersPresenter(.moya)
     
     @IBOutlet weak var tableView: UITableView!
     

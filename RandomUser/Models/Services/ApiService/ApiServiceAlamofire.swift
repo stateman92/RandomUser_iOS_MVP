@@ -10,7 +10,7 @@ import Foundation
 import Alamofire
 
 /// The service, which used to download user-related data.
-class UserServiceAlamofire: RandomUserServiceProtocol {
+class ApiServiceAlamofire: ApiServiceProtocol {
     
     func getUsers(page: Int, results: Int, seed: String, completion: @escaping (Result<[User], ErrorTypes>) -> ()) {
         guard let url = createUrl(page, results, seed) else {
@@ -42,7 +42,7 @@ class UserServiceAlamofire: RandomUserServiceProtocol {
                           URLQueryItem(name: "page", value: String(page)),
                           URLQueryItem(name: "results", value: String(results)),
                           URLQueryItem(name: "seed", value: String(seed))]
-        guard var urlComps = URLComponents(string: getBaseApiUrl()) else { return nil }
+        guard var urlComps = URLComponents(string: "https://randomuser.me/api/1.3/") else { return nil }
         urlComps.queryItems = queryItems
         guard let url = urlComps.url else { return nil }
         return url

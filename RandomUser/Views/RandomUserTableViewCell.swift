@@ -19,6 +19,8 @@ class RandomUserTableViewCell: UITableViewCell {
     /// If the content not ready, shows a loading animation.
     var activityIndicatorView: UIActivityIndicatorView?
     
+    private let imageServiceContainer: ImageServiceContainerProtocol = ImageServiceContainer(.sdwebimage)
+    
     private var isAnimating: Bool {
         return activityIndicatorView?.isAnimating ?? false
     }
@@ -38,7 +40,7 @@ extension RandomUserTableViewCell {
     /// Shows the data of the user.
     func configureData(withUser user: User) {
         userName?.text = user.fullName
-        ImageService().load(url: user.picture.medium, into: userImage, type: .sdwebimage, isLoadingPresenting: true)
+        imageServiceContainer.load(url: user.picture.medium, into: userImage)
     }
     
     /// Shows the data that the user wants to see.

@@ -14,6 +14,7 @@ import Hero
 class UserDetailsViewController: UIViewController {
     
     var user: User!
+    private let imageServiceContainer = ImageServiceContainer(.nuke)
     
     @IBOutlet weak var userImageView: UIImageView!
     @IBOutlet weak var userAccessibilitiesLabel: UILabel!
@@ -49,8 +50,8 @@ extension UserDetailsViewController {
         let gradient = SkeletonGradient(baseColor: .darkGray)
         userImageView.showAnimatedGradientSkeleton(usingGradient: gradient, transition: .crossDissolve(1))
         
-        ImageService().load(url: user.picture.large, into: userImageView, completionHandler: {
+        imageServiceContainer.load(url: user.picture.large, into: userImageView, withDelay: 2.0) {
             self.userImageView.hideSkeleton()
-        }, type: .nuke, withDelay: 2.0)
+        }
     }
 }

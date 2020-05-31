@@ -13,11 +13,11 @@ class RandomUsersPresenter {
     
     /// MVP architecture elements.
     private var randomUserProtocol: RandomUserViewProtocol?
-    private var baseUserService: RandomUserServiceProtocol
+    private var apiServiceContainer: ApiServiceContainerProtocol
     
     /// Dependency Injection via Constructor Injection.
-    init(_ baseUserService: RandomUserServiceProtocol) {
-        self.baseUserService = baseUserService
+    init(_ userServiceType: ApiServiceBase.USType) {
+        self.apiServiceContainer = ApiServiceBase.init(userServiceType)
     }
     
     /// Number of users that will be downloaded at the same time.
@@ -63,8 +63,8 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     }
     
     /// Dependency Injection via Setter Injection.
-    func inject(_ baseUserService: RandomUserServiceProtocol) {
-        self.baseUserService = baseUserService
+    func inject(_ baseUserService: ApiServiceContainerProtocol) {
+        self.apiServiceContainer = baseUserService
     }
     
     /// Fetch some random users.
@@ -75,7 +75,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        baseUserService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
+        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
             switch result {
             case .success(let users):
                 self.users = users
@@ -108,7 +108,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        baseUserService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
+        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
             switch result {
             case .success(let users):
                 self.users.append(contentsOf: users)
