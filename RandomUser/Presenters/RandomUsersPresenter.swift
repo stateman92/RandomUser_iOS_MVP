@@ -30,14 +30,13 @@ class RandomUsersPresenter {
     private var nextPage: Int {
         return users.count / numberOfUsersPerPage + 1
     }
+    /// If fetch is in progress, no more network request will be executed.
+    private var isFetchInProgress = false
     
     /// `RandomUserPresenterProtocol` variables part.
     
     /// The so far fetched user data.
     var users = [User]()
-    
-    /// If fetch is in progress, no more network request will be executed.
-    var isFetchInProgress = false
 }
 
 // MARK: The RandomUserPresenterProtocol part.
@@ -78,7 +77,6 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     /// Fetch some random users.
     /// - Note:
     /// It calls either `randomUsersAvailable()` or `errorWhileDownload()` method of the `delegate`.
-    /// The `isFetchInProgress` variable should be set to false by the View after all the data displayed corretly!
     func getRandomUsers() {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
@@ -87,9 +85,12 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
             switch result {
             case .success(let users):
                 self.users = users
-                self.randomUserProtocol?.didRandomUsersAvailable()
+                self.randomUserProtocol?.didRandomUsersAvailable {
+                    self.isFetchInProgress = false
+                }
             case .failure(let errorType):
                 self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: errorType.rawValue)
+                self.isFetchInProgress = false
             }
         }
     }
@@ -110,7 +111,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
             switch result {
             case .success(let users):
                 self.users.append(contentsOf: users)
-                self.persistenceServiceContainer.deleteAndAdd(UserObject.self, users)
+                self.persistenceServiceContainer.deleteAndAdd(UserObject.self, self.users)
                 self.randomUserProtocol?.didEndRandomUsersPaging()
             case .failure(let errorType):
                 self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: errorType.rawValue)
@@ -135,9 +136,12 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     
     /// Retrieve the previously cached users.
     func getCachedUsers() {
+        isFetchInProgress = true
         run(1.0) {
             defer {
-                self.randomUserProtocol?.didRandomUsersAvailable()
+                self.randomUserProtocol?.didRandomUsersAvailable {
+                    self.isFetchInProgress = false
+                }
             }
             
             let users = self.persistenceServiceContainer.objects(UserObject.self)

@@ -17,7 +17,9 @@ import RealmSwift
 protocol RandomUserViewProtocol {
     
     /// Will be called after it downloads data while previously it contains (locally) no data.
-    func didRandomUsersAvailable()
+    /// - Parameters:
+    ///   - completion: must be called after the view presented correctly.
+    func didRandomUsersAvailable(_ completion: @escaping () -> Void)
     
     /// Will be called if the refresh (download new users with new seed value) starts.
     func willRandomUsersRefresh()
@@ -26,7 +28,21 @@ protocol RandomUserViewProtocol {
     func didEndRandomUsersPaging()
     
     /// Will be called if any error occured while the requests.
+    /// - Parameters:
+    ///   - errorMessage: the description of the error.
     func didErrorOccuredWhileDownload(errorMessage: String)
+}
+
+extension RandomUserViewProtocol {
+    
+    /// Will be called after it downloads data while previously it contains (locally) no data. It's the customization of the `RandomUserViewProtocol`'s `didRandomUsersAvailable(completion:)` method.
+    /// - Parameters:
+    ///   - completion: optional argument, by default it does nothing.
+    func didRandomUsersAvailable(_ completion: @escaping () -> Void = { }) {
+        didRandomUsersAvailable {
+            completion()
+        }
+    }
 }
 
 // MARK: - Presenter part.
@@ -34,9 +50,6 @@ protocol RandomUserPresenterProtocol {
     
     /// The so far fetched user data.
     var users: [User] { get set }
-    
-    /// If fetch is in progress, no more network request will be executed.
-    var isFetchInProgress: Bool { get set }
     
     /// Returns the so far fetched data + number of users in a page.
     var currentMaxUsers: Int { get }

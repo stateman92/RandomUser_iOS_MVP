@@ -168,10 +168,10 @@ extension RandomUsersViewController {
 extension RandomUsersViewController: RandomUserViewProtocol {
     
     /// After successfully filled the array of the data, stop the animation and animate the `UITableView`.
-    func didRandomUsersAvailable() {
+    func didRandomUsersAvailable(_ completion: @escaping () -> Void) {
         stopAnimating {
             self.tableView.animateUITableView {
-                self.randomUsersPresenter.isFetchInProgress = false
+                completion()
             }
         }
     }
@@ -186,7 +186,6 @@ extension RandomUsersViewController: RandomUserViewProtocol {
     /// After an error occured, show it to the user.
     func didErrorOccuredWhileDownload(errorMessage: String) {
         stopAnimating()
-        randomUsersPresenter.isFetchInProgress = false
         
         let alert = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
