@@ -6,7 +6,6 @@
 //  Copyright © 2020. Kálai Kristóf. All rights reserved.
 //
 
-import Foundation
 import SDWebImage
 
 /// The `ImageServiceProtocol` implemented by SDWebImage.

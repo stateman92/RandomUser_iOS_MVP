@@ -127,6 +127,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     ///   - withDelay: the duration after the fetch starts.
     func refresh(withDelay delay: Double = 0) {
         users.removeAll()
+        persistenceServiceContainer.deleteAndAdd(UserObject.self, [User]())
         seed = String.getRandomString()
         randomUserProtocol?.willRandomUsersRefresh()
         run(delay) {
@@ -138,15 +139,17 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     func getCachedUsers() {
         isFetchInProgress = true
         run(1.0) {
-            defer {
-                self.randomUserProtocol?.didRandomUsersAvailable {
-                    self.isFetchInProgress = false
-                }
-            }
-            
             let users = self.persistenceServiceContainer.objects(UserObject.self)
             for user in users {
                 self.users.append(User(managedObject: user))
+            }
+            if users.count == 0 {
+                self.isFetchInProgress = false
+                self.getRandomUsers()
+            } else {
+                self.randomUserProtocol?.didRandomUsersAvailable {
+                    self.isFetchInProgress = false
+                }
             }
         }
     }
