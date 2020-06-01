@@ -103,18 +103,18 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         isFetchInProgress = true
         
         apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
+            defer {
+                self.isFetchInProgress = false
+            }
+            
             switch result {
             case .success(let users):
                 self.users.append(contentsOf: users)
-                
-                self.persistenceServiceContainer.delete(self.persistenceServiceContainer.objects(UserObject.self))
-                self.persistenceServiceContainer.add(self.users)
-                
+                self.persistenceServiceContainer.deleteAndAdd(UserObject.self, users)
                 self.randomUserProtocol?.didEndRandomUsersPaging()
             case .failure(let errorType):
                 self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: errorType.rawValue)
             }
-            self.isFetchInProgress = false
         }
     }
     
