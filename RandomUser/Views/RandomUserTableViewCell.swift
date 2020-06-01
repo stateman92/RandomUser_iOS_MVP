@@ -19,7 +19,7 @@ class RandomUserTableViewCell: UITableViewCell {
     /// If the content not ready, shows a loading animation.
     var activityIndicatorView: UIActivityIndicatorView?
     
-    private let imageServiceContainer: ImageServiceContainerProtocol = ImageServiceContainer(.sdwebimage)
+    private let imageServiceContainer: ImageServiceContainerProtocol = ImageServiceContainer()
     
     private var isAnimating: Bool {
         return activityIndicatorView?.isAnimating ?? false

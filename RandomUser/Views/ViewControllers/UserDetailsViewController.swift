@@ -14,7 +14,7 @@ import Hero
 class UserDetailsViewController: UIViewController {
     
     var user: User!
-    private let imageServiceContainer: ImageServiceContainerProtocol = ImageServiceContainer(.nuke)
+    private let imageServiceContainer: ImageServiceContainerProtocol = ImageServiceContainer()
     
     @IBOutlet weak var userImageView: UIImageView!
     @IBOutlet weak var userAccessibilitiesLabel: UILabel!
