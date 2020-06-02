@@ -14,7 +14,7 @@ import RealmSwift
 
 
 // MARK: - View part.
-protocol RandomUserViewProtocol {
+protocol RandomUserViewProtocol: class {
     
     /// Will be called after it downloads data while previously it contains (locally) no data.
     /// - Parameters:

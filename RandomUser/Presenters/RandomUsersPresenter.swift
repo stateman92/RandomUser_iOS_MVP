@@ -12,7 +12,7 @@ import Foundation
 class RandomUsersPresenter {
     
     /// MVP architecture elements.
-    private var randomUserProtocol: RandomUserViewProtocol?
+    private weak var randomUserProtocol: RandomUserViewProtocol?
     private var apiServiceContainer: ApiServiceContainerProtocol
     private var persistenceServiceContainer: PersistenceServiceContainerProtocol
     
@@ -81,7 +81,8 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
+        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { [weak self] result in
+            guard let self = self else { return }
             switch result {
             case .success(let users):
                 self.users = users
@@ -103,7 +104,8 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { result in
+        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { [weak self] result in
+            guard let self = self else { return }
             defer {
                 self.isFetchInProgress = false
             }
@@ -130,7 +132,8 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         persistenceServiceContainer.deleteAndAdd(UserObject.self, [User]())
         seed = String.getRandomString()
         randomUserProtocol?.willRandomUsersRefresh()
-        run(delay) {
+        run(delay) { [weak self] in
+            guard let self = self else { return }
             self.getRandomUsers()
         }
     }
@@ -138,7 +141,8 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     /// Retrieve the previously cached users.
     func getCachedUsers() {
         isFetchInProgress = true
-        run(1.0) {
+        run(1.0) { [weak self] in
+            guard let self = self else { return }
             let users = self.persistenceServiceContainer.objects(UserObject.self)
             for user in users {
                 self.users.append(User(managedObject: user))
