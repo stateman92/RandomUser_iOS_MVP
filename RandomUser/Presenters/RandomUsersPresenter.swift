@@ -13,13 +13,13 @@ class RandomUsersPresenter {
     
     /// MVP architecture elements.
     private weak var randomUserProtocol: RandomUserViewProtocol?
-    private var apiServiceContainer: ApiServiceContainerProtocol
-    private var persistenceServiceContainer: PersistenceServiceContainerProtocol
+    private var apiService: ApiServiceProtocol
+    private var persistenceService: PersistenceServiceProtocol
     
     /// Dependency Injection via Constructor Injection.
     init(_ apiServiceType: ApiServiceContainer.USType = .alamofire, _ persistenceServiceType: PersistenceServiceContainer.PSType = .realm) {
-        self.apiServiceContainer = ApiServiceContainer.init(apiServiceType)
-        self.persistenceServiceContainer = PersistenceServiceContainer.init(persistenceServiceType)
+        self.apiService = ApiServiceContainer.init(apiServiceType).service
+        self.persistenceService = PersistenceServiceContainer.init(persistenceServiceType).service
     }
     
     /// Number of users that will be downloaded at the same time.
@@ -65,13 +65,13 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     }
     
     /// Dependency Injection via Setter Injection.
-    func inject(_ apiServiceContainer: ApiServiceContainerProtocol) {
-        self.apiServiceContainer = apiServiceContainer
+    func inject(_ apiService: ApiServiceProtocol) {
+        self.apiService = apiService
     }
     
     /// Dependency Injection via Setter Injection.
-    func inject(_ persistenceServiceContainer: PersistenceServiceContainerProtocol) {
-        self.persistenceServiceContainer = persistenceServiceContainer
+    func inject(_ persistenceService: PersistenceServiceProtocol) {
+        self.persistenceService = persistenceService
     }
     
     /// Fetch some random users.
@@ -81,7 +81,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { [weak self] result in
+        apiService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let users):
@@ -104,7 +104,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
         
-        apiServiceContainer.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { [weak self] result in
+        apiService.getUsers(page: nextPage, results: numberOfUsersPerPage, seed: seed) { [weak self] result in
             guard let self = self else { return }
             defer {
                 self.isFetchInProgress = false
@@ -113,7 +113,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
             switch result {
             case .success(let users):
                 self.users.append(contentsOf: users)
-                self.persistenceServiceContainer.deleteAndAdd(UserObject.self, self.users)
+                self.persistenceService.deleteAndAdd(UserObject.self, self.users)
                 self.randomUserProtocol?.didEndRandomUsersPaging()
             case .failure(let errorType):
                 self.randomUserProtocol?.didErrorOccuredWhileDownload(errorMessage: errorType.rawValue)
@@ -129,7 +129,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     ///   - withDelay: the duration after the fetch starts.
     func refresh(withDelay delay: Double = 0) {
         users.removeAll()
-        persistenceServiceContainer.deleteAndAdd(UserObject.self, [User]())
+        persistenceService.deleteAndAdd(UserObject.self, [User]())
         seed = String.getRandomString()
         randomUserProtocol?.willRandomUsersRefresh()
         run(delay) { [weak self] in
@@ -143,7 +143,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
         isFetchInProgress = true
         run(1.0) { [weak self] in
             guard let self = self else { return }
-            let users = self.persistenceServiceContainer.objects(UserObject.self)
+            let users = self.persistenceService.objects(UserObject.self)
             for user in users {
                 self.users.append(User(managedObject: user))
             }

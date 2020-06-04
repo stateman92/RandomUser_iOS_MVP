@@ -59,8 +59,8 @@ protocol RandomUserPresenterProtocol {
     
     /// Dependency Injection via Setter Injection.
     func inject(_ delegate: RandomUserViewProtocol)
-    func inject(_ apiServiceContainer: ApiServiceContainerProtocol)
-    func inject(_ persistenceServiceContainer: PersistenceServiceContainerProtocol) 
+    func inject(_ apiService: ApiServiceProtocol)
+    func inject(_ persistenceService: PersistenceServiceProtocol) 
     
     /// Fetch some random users.
     func getRandomUsers()
