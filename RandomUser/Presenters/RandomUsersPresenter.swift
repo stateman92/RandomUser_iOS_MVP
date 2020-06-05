@@ -17,8 +17,8 @@ class RandomUsersPresenter {
     private var persistenceService: PersistenceServiceProtocol
     
     /// Dependency Injection via Constructor Injection.
-    init(_ apiServiceType: ApiServiceContainer.USType = .alamofire, _ persistenceServiceType: PersistenceServiceContainer.PSType = .realm) {
-        self.apiService = ApiServiceContainer.init(apiServiceType).service
+    init(_ persistenceServiceType: PersistenceServiceContainer.PSType = .realm) {
+        apiService = AppDelegate.container.resolve(ApiServiceProtocol.self)!
         self.persistenceService = PersistenceServiceContainer.init(persistenceServiceType).service
     }
     
@@ -45,7 +45,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     /// Returns the so far fetched data + number of users in a page.
     /// - Note:
     /// If the number of the displayed user is greater or equal with the `users.count` but less than the `currentMaxUsers`,
-    ///     the View can display a loading icon.
+    /// the View can display a loading icon.
     var currentMaxUsers: Int {
         return nextPage * numberOfUsersPerPage
     }
@@ -76,7 +76,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     
     /// Fetch some random users.
     /// - Note:
-    /// It calls either `randomUsersAvailable()` or `errorWhileDownload()` method of the `delegate`.
+    /// It calls either `didRandomUsersAvailable()` or `didErrorOccuredWhileDownload()` method of the `randomUserProtocol`.
     func getRandomUsers() {
         guard !isFetchInProgress else { return }
         isFetchInProgress = true
@@ -124,7 +124,7 @@ extension RandomUsersPresenter: RandomUserPresenterProtocol {
     /// Fetch some new random users.
     /// - Note:
     /// Remove all so far downloaded data, recreate the seed value.
-    /// Immediately calls the `randomUsersRefreshStarted()` method of the `delegate`.
+    /// Immediately calls the `willRandomUsersRefresh()` method of the `randomUserProtocol`.
     /// - Parameters:
     ///   - withDelay: the duration after the fetch starts.
     func refresh(withDelay delay: Double = 0) {

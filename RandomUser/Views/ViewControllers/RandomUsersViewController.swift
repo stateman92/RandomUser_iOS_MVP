@@ -98,7 +98,7 @@ extension RandomUsersViewController: UITableViewDelegate, UITableViewDataSource 
         return cell
     }
     
-    /// After the initial download (while the `activityIndicatorView` is animating), refresh the data.
+    /// After the initial download (while the `animationView` is animating), refresh the data.
     @objc func tableViewPullToRefresh() {
         if !animationView.isAnimationPlaying {
             randomUsersPresenter.refresh(withDelay: refreshDelay)

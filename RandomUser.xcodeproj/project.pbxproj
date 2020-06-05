@@ -52,6 +52,7 @@
 		7CC4AFD5246F20D600E83734 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 7CC4AFD4246F20D600E83734 /* Moya */; };
 		7CC4AFDB246F227900E83734 /* ApiServiceMoya.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC4AFDA246F227900E83734 /* ApiServiceMoya.swift */; };
 		7CC4AFDD246F259100E83734 /* sample.json in Resources */ = {isa = PBXBuildFile; fileRef = 7CC4AFDC246F259100E83734 /* sample.json */; };
+		7CD20044248AC13F005A4A71 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 7CD20043248AC13F005A4A71 /* Swinject */; };
 		7CD27D682470E87600126B05 /* HeroIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD27D672470E87600126B05 /* HeroIDs.swift */; };
 		7CFAC696247375FC009EE995 /* RandomUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFAC695247375FC009EE995 /* RandomUsersViewController.swift */; };
 		7CFAC69824737614009EE995 /* UserDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFAC69724737614009EE995 /* UserDetailsViewController.swift */; };
@@ -111,6 +112,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C2952A5246AD6B100E4B64B /* Kingfisher in Frameworks */,
+				7CD20044248AC13F005A4A71 /* Swinject in Frameworks */,
 				7CC4AFD2246F1D5500E83734 /* Hero in Frameworks */,
 				7CC4AFD5246F20D600E83734 /* Moya in Frameworks */,
 				7C23D77524892CB200BA6675 /* RealmSwift in Frameworks */,
@@ -296,6 +298,7 @@
 				7C3E9AFF2483B4B90061A945 /* SDWebImage */,
 				7C3E9B042483BC230061A945 /* Lottie */,
 				7C23D77424892CB200BA6675 /* RealmSwift */,
+				7CD20043248AC13F005A4A71 /* Swinject */,
 			);
 			productName = RandomUser;
 			productReference = 7C295281246AD09300E4B64B /* RandomUser.app */;
@@ -336,6 +339,7 @@
 				7C3E9AFE2483B4B90061A945 /* XCRemoteSwiftPackageReference "SDWebImage" */,
 				7C3E9B032483BC230061A945 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				7C23D77324892CB200BA6675 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
+				7CD20042248AC13F005A4A71 /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			productRefGroup = 7C295282246AD09300E4B64B /* Products */;
 			projectDirPath = "";
@@ -678,6 +682,14 @@
 				minimumVersion = 14.0.0;
 			};
 		};
+		7CD20042248AC13F005A4A71 /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -725,6 +737,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7CC4AFD3246F20D600E83734 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = Moya;
+		};
+		7CD20043248AC13F005A4A71 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7CD20042248AC13F005A4A71 /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
