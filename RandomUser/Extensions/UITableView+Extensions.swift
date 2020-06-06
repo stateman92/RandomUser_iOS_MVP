@@ -24,7 +24,7 @@ extension UITableView {
             })
             delayCounter += 1
         }
-        run(2) {
+        run(1.75) {
             completion()
         }
     }
